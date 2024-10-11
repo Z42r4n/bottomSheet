@@ -1,5 +1,5 @@
 import { View, Text, Dimensions, StatusBar } from "react-native";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
@@ -13,23 +13,39 @@ const { width, height } = Dimensions.get("window");
 const Y_MAX_H = -height + (StatusBar.currentHeight || 100);
 
 const BottomSheet = () => {
-  // height shred value
   const translateY = useSharedValue(0);
   const context = useSharedValue({ y: 0 });
 
+  // function to scroll with spring animation
+  const scrollTo = useCallback((dest: number) => {
+    "worklet";
+    translateY.value = withSpring(dest, { damping: 50 });
+  }, []);
+
   // gesture handler
-  const gusture = Gesture.Pan()
+  const gesture = Gesture.Pan()
     .onStart(() => {
+      // Store the current translation value at the start of the gesture
       // context.value = { y: translateY.value };
     })
     .onChange((event) => {
-      // translateY.value = event.translationY + context.value.y;
-      // translateY.value = Math.max(translateY.value, -height + (StatusBar.currentHeight || 50));
       translateY.value += event.changeY;
       translateY.value = Math.max(translateY.value, Y_MAX_H);
+    })
+    .onEnd(() => {
+      if (translateY.value > -height / 3) {
+        scrollTo(-10); // Close the bottom sheet
+      } else if (translateY.value < -height / 1.5) {
+        scrollTo(Y_MAX_H); // Fully open the bottom sheet
+      }
     });
 
-  // animated style
+  // applay animation on the start
+  useEffect(() => {
+    scrollTo(-height * 0.3);
+  }, []);
+
+  // Animated style for translateY
   const translateYStyle = useAnimatedStyle(() => {
     return {
       borderRadius: interpolate(
@@ -42,13 +58,8 @@ const BottomSheet = () => {
     };
   });
 
-  // applay animation on the start
-  useEffect(() => {
-    translateY.value = withSpring(-height * 0.3, { damping: 50 });
-  }, []);
-
   return (
-    <GestureDetector gesture={gusture}>
+    <GestureDetector gesture={gesture}>
       {/* bottomSheet container */}
       <Animated.View
         style={[
@@ -71,7 +82,7 @@ const BottomSheet = () => {
             width: 80,
             height: 5,
             borderRadius: 2.5,
-            marginVertical: 10,
+            marginVertical: 15,
           }}
         />
       </Animated.View>
