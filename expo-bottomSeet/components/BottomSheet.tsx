@@ -2,6 +2,8 @@ import { View, Text, Dimensions, StatusBar } from "react-native";
 import React, { useEffect } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+  Extrapolation,
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -30,6 +32,12 @@ const BottomSheet = () => {
   // animated style
   const translateYStyle = useAnimatedStyle(() => {
     return {
+      borderRadius: interpolate(
+        translateY.value,
+        [-height + height * 0.3, -height],
+        [25, 5],
+        Extrapolation.CLAMP
+      ),
       transform: [{ translateY: translateY.value }],
     };
   });
@@ -50,7 +58,7 @@ const BottomSheet = () => {
             width,
             height,
             top: height,
-            borderRadius: 20,
+            borderRadius: 25,
           },
           translateYStyle, // animated style
         ]}
