@@ -7,7 +7,7 @@ import { useCallback, useRef } from "react";
 export default function App() {
   const sheetRef = useRef<ButtomSheetRefProps>(null);
   const onPress = useCallback(() => {
-    sheetRef.current?.scrollTo(-100);
+    sheetRef.current?.scrollTo(-500);
   }, []);
   return (
     <GestureHandlerRootView>
@@ -25,7 +25,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
     borderRadius: 25,
     opacity: 0.5,
-    backgroundColor: "white",
+    backgroundColor: "yellow",
   },
   content: {
     flex: 1,

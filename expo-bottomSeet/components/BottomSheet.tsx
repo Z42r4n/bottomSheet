@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, StatusBar } from "react-native";
+import { View, Text, Dimensions, StatusBar, StyleSheet } from "react-native";
 import React, {
   forwardRef,
   useCallback,
@@ -10,6 +10,7 @@ import Animated, {
   Easing,
   Extrapolation,
   interpolate,
+  useAnimatedProps,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -37,10 +38,8 @@ const BottomSheet = forwardRef<ButtomSheetRefProps, ButtomSheet>(
     const scrollTo = useCallback((dest: number, duration: number = 500) => {
       "worklet";
       translateY.value = withSpring(dest, {
-        damping: 50,
-        stiffness: 300,
-        // easing: Easing.inOut(Easing.ease)
-        // damping: 50,
+        damping: 40,
+        stiffness: 500,
       });
     }, []);
 
@@ -95,36 +94,61 @@ const BottomSheet = forwardRef<ButtomSheetRefProps, ButtomSheet>(
       };
     });
 
+    const animatedBackDrop = useAnimatedStyle(() => {
+      return {
+        opacity: withTiming(1),
+      };
+    }, []);
+
+    const animatedProps = useAnimatedProps(() => {
+      return {
+        pointerEvents: "none",
+      };
+    }) as any;
+
     return (
-      <GestureDetector gesture={gesture}>
-        {/* bottomSheet container */}
+      <>
         <Animated.View
+          animatedProps={animatedProps}
           style={[
             {
-              backgroundColor: "white",
-              position: "absolute",
-              width,
-              height,
-              top: height,
-              borderRadius: 25,
+              ...StyleSheet.absoluteFillObject,
+              backgroundColor: "rgba(0,0,0,0.4)",
             },
-            translateYStyle, // animated style
+            animatedBackDrop,
           ]}
-        >
-          {/* gray line */}
-          <View
-            style={{
-              backgroundColor: "gray",
-              alignSelf: "center",
-              width: 80,
-              height: 5,
-              borderRadius: 2.5,
-              marginVertical: 15,
-            }}
-          />
-          {children}
-        </Animated.View>
-      </GestureDetector>
+          // onTouchStart={}
+        />
+        <GestureDetector gesture={gesture}>
+          {/* bottomSheet container */}
+          <Animated.View
+            style={[
+              {
+                backgroundColor: "white",
+                position: "absolute",
+                width,
+                height,
+                top: height,
+                borderRadius: 25,
+              },
+              translateYStyle, // animated style
+            ]}
+          >
+            {/* gray line */}
+            <View
+              style={{
+                backgroundColor: "gray",
+                alignSelf: "center",
+                width: 80,
+                height: 5,
+                borderRadius: 2.5,
+                marginVertical: 15,
+              }}
+            />
+            {children}
+          </Animated.View>
+        </GestureDetector>
+      </>
     );
   }
 );
